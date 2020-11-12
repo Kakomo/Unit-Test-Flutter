@@ -41,4 +41,5 @@ class ContactDao{
     }
     return contacts;
   }
+
 }

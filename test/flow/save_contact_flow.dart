@@ -1,14 +1,16 @@
 
 import 'package:bytebank/main.dart';
+import 'package:bytebank/model/contact.dart';
 import 'package:bytebank/screens/contact_form.dart';
 import 'package:bytebank/screens/contacts_list.dart';
 import 'package:bytebank/screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 
-import 'MockContactDao.dart';
-import 'dashboard_widget_test.dart';
-import 'matchers.dart';
+import '../mocks/MockContactDao.dart';
+import '../widget/dashboard_widget_test.dart';
+import '../matchers/matchers.dart';
 
 void main(){
   testWidgets('Save_Contact_Test', (tester) async{
@@ -22,6 +24,8 @@ void main(){
    expect(transferFeatureItem, findsOneWidget);
    await tester.tap(transferFeatureItem);
    await tester.pumpAndSettle();
+
+   verify(mockContactDao.findAll()).called(1);
 
    final contactList = find.byType(ContactsList);
    expect(contactList, findsOneWidget);
@@ -56,9 +60,12 @@ void main(){
    expect(createButton, findsOneWidget);
    await tester.tap(createButton);
    await tester.pumpAndSettle();
+   verify(mockContactDao.save(Contact(0,'Caio', 5)));
 
    final contactListBack = find.byType(ContactsList);
    expect(contactListBack,findsOneWidget);
+
+   verify(mockContactDao.findAll());
 
 
 
