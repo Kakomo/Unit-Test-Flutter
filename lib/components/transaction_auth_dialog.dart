@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const Key transactionAuthDialogTextFieldPasswordKey = Key('transactionAuthDialogTextFieldPassword');
+
 class TransactionsAuthDialog extends StatefulWidget {
   final Function(String password) onConfirm;
   TransactionsAuthDialog({@required this.onConfirm});
@@ -15,6 +17,7 @@ class _TransactionsAuthDialogState extends State<TransactionsAuthDialog> {
     return AlertDialog(
       title: Text('Authenticate'),
       content: TextField(
+        key: transactionAuthDialogTextFieldPasswordKey,
         controller: _passwordController,
         obscureText: true,
         maxLength: 4,

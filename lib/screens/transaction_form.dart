@@ -7,6 +7,7 @@ import 'package:bytebank/http/webclient.dart';
 import 'package:bytebank/http/webclients/transactions_webclient.dart';
 import 'package:bytebank/model/contact.dart';
 import 'package:bytebank/model/transactions.dart';
+import 'package:bytebank/widgets/app_dependencies.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,13 +22,13 @@ class TransactionForm extends StatefulWidget {
 
 class _TransactionFormState extends State<TransactionForm> {
   final TextEditingController _valueController = TextEditingController();
-  final TransactionsWebClient _webClient = TransactionsWebClient();
   final String transactionId = Uuid().v4();
 
   bool _sending = false;
 
   @override
   Widget build(BuildContext context) {
+    final dependencies = AppDependencies.of(context);
     print('The Transacton UUID is: $transactionId');
     return Scaffold(
       appBar: AppBar(
@@ -87,7 +88,7 @@ class _TransactionFormState extends State<TransactionForm> {
                           builder: (contextDialog) {
                             return TransactionsAuthDialog(
                               onConfirm: (String password) {
-                                _save(transactionCreated, password, context);
+                                _save(dependencies.transactionsWebClient,transactionCreated, password, context);
                               },
                             );
                           });
@@ -102,9 +103,9 @@ class _TransactionFormState extends State<TransactionForm> {
     );
   }
 
-  void _save(Transaction transactionCreated, String password,
+  void _save(TransactionsWebClient webClient, Transaction transactionCreated, String password,
       BuildContext context) async {
-    Transaction transaction = await _send(transactionCreated, password, context);
+    Transaction transaction = await _send(webClient,transactionCreated, password, context);
     if (transaction != null) {
       await _showSuccessfulMessage(context);
       Navigator.pop(context);
@@ -119,12 +120,12 @@ class _TransactionFormState extends State<TransactionForm> {
         });
   }
 
-  Future<Transaction> _send(Transaction transactionCreated, String password, BuildContext context) async {
+  Future<Transaction> _send(TransactionsWebClient webClient, Transaction transactionCreated, String password, BuildContext context) async {
     setState(() {
       _sending =true;
     });
     final Transaction transaction =
-        await _webClient.save(transactionCreated, password).catchError((error) {
+        await webClient.save(transactionCreated, password).catchError((error) {
           _showFailureMessage(context,message: error.message);
         }, test: (error) => error is HttpException).catchError((error){
           _showFailureMessage(context,message: 'I could not talk to the server');

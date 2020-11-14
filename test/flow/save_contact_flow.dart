@@ -9,13 +9,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import '../mocks/MockContactDao.dart';
+import '../mocks/MockTransactionsWebClient.dart';
 import '../widget/dashboard_widget_test.dart';
 import '../matchers/matchers.dart';
 
 void main(){
   testWidgets('Save_Contact_Test', (tester) async{
    final mockContactDao = MockContactDao();
-   await tester.pumpWidget(ByteBank(contactDao: mockContactDao,));
+   await tester.pumpWidget(ByteBank(contactDao: mockContactDao,transactionsWebClient: MockTransactionsWebClient(),));
    final dashboard = find.byType(Dashboard);
    expect(dashboard, findsOneWidget);
 
@@ -39,19 +40,13 @@ void main(){
    expect(contactForm, findsOneWidget);
 
    final nameTextField = find.byWidgetPredicate((widget) {
-    if(widget is TextField){
-     return widget.decoration.labelText == 'Full Name';
-    }
-    return false;
+    return textFieldByLabelText(widget,'Full Name');
    });
    expect(nameTextField, findsOneWidget);
    await tester.enterText(nameTextField, 'Caio');
 
    final accountNumberTextField = find.byWidgetPredicate((widget) {
-    if(widget is TextField){
-     return widget.decoration.labelText == 'Account Number';
-    }
-    return false;
+    return textFieldByLabelText(widget, 'Account Number');
    });
    expect(accountNumberTextField, findsOneWidget);
    await tester.enterText(accountNumberTextField, '5');
@@ -71,6 +66,7 @@ void main(){
 
   });
 }
+
 
 
 
